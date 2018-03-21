@@ -4,10 +4,7 @@ class SessionsController < ApplicationController
   def create
     github = GithubService.new
     session[:token] = github.authenticate!(ENV['GITHUB_CLIENT'], ENV['GITHUB_SECRET'], params[:code])
-
-    user_response = Faraday.get "https://api.github.com/user", {}, {'Authorization' => "token #{session[:token]}", 'Accept' => 'application/json'}
-    user_json = JSON.parse(user_response.body)
-    session[:username] = user_json["login"]
+    session[:username] = github.get_username
 
     redirect_to '/'
   end
